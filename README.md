@@ -1,6 +1,6 @@
-# Neurofive ML Track — Titanic Survival Prediction
+# Neurofive ML Track — Titanic Survival Prediction & Housing Price Regression
 
-This repository contains my work for the Neurofive Solutions ML internship track, covering exploratory data analysis, data cleaning, visualization, and a first machine learning model using the Titanic dataset.
+This repository contains my work for the Neurofive Solutions ML internship track, covering exploratory data analysis, data cleaning, visualization, classification, regression, and model evaluation/tuning.
 
 ## Approach
 
@@ -17,23 +17,45 @@ This repository contains my work for the Neurofive Solutions ML internship track
    - A bar chart comparing survival rate across passenger classes
    - A correlation heatmap across numerical features
 
-4. **Modeling** — Built a binary classification model to predict passenger survival:
+4. **Classification Modeling** — Built a binary classification model to predict passenger survival:
    - Encoded categorical features (`Sex`, `Embarked`) using `pd.get_dummies()`
    - Split the data using `train_test_split` (80% train / 20% test)
    - Trained a **Logistic Regression** model using scikit-learn
    - Evaluated performance using `accuracy_score` and a confusion matrix
 
-## Results
+5. **Model Evaluation & Hyperparameter Tuning** — Went beyond accuracy to evaluate the classification model properly:
+   - Calculated precision, recall, and F1-score using `classification_report`, since accuracy alone can be misleading on imbalanced datasets — a model could score high accuracy simply by always predicting the majority class, without correctly identifying the minority class (survivors)
+   - Tuned two hyperparameters — `C` (regularization strength) and `solver` (optimization algorithm) — using `GridSearchCV` with 3-fold cross-validation across `C: [0.1, 1, 10]`
+
+6. **Regression Modeling** (separate notebook, California Housing dataset) — Built a regression model to predict median house value:
+   - Selected 4 features: `MedInc`, `AveRooms`, `HouseAge`, `AveOccup`
+   - Split the data using `train_test_split` (80% train / 20% test)
+   - Trained a **Linear Regression** model using scikit-learn
+   - Evaluated performance using RMSE and R² score
+
+## Results — Classification (Titanic)
 
 - **Model accuracy:** 81.01%
-- **Confusion matrix:**
+- Correctly predicted 90 non-survivors and 55 survivors
+- 15 false positives (predicted survived, but didn't)
+- 19 false negatives (predicted did not survive, but did)
+- The model performs slightly better at identifying non-survivors than survivors, with a relatively balanced number of false positives and false negatives
 
-|  | Predicted: Did Not Survive | Predicted: Survived |
-|---|---|---|
-| **Actual: Did Not Survive** | 90 | 15 |
-| **Actual: Survived** | 19 | 55 |
+## Results — Hyperparameter Tuning (Titanic)
 
-The model performs slightly better at identifying non-survivors than survivors, with a relatively balanced number of false positives (15) and false negatives (19).
+- **Best hyperparameters found:** `C=0.1`, `solver=liblinear`
+- Original model accuracy: 81.01%
+- Tuned model accuracy: 78.21%
+- Tuned model precision (Survived): 0.76
+- Tuned model recall (Survived): 0.69
+- Tuned model F1-score (Survived): 0.72
+- The tuned model performed slightly worse on the test set than the original default model. This highlights that hyperparameter tuning optimizes for average performance across cross-validation folds, which doesn't always guarantee improvement on a specific held-out test set — especially with a relatively small dataset (891 rows total). Tuned models should always be validated against a held-out test set rather than assumed to automatically improve results.
+
+## Results — Regression (California Housing)
+
+- **RMSE:** 0.8108 (≈ $81,000 average prediction error)
+- **R² Score:** 0.4983 (model explains ~50% of price variation)
+- The model captures a real relationship between income, home size, and price, but roughly half of the price variation remains unexplained by these 4 features alone — likely driven by unmodeled factors like exact location, school quality, and property condition
 
 ## Tech Stack
 
@@ -44,5 +66,6 @@ The model performs slightly better at identifying non-survivors than survivors, 
 
 ## Files
 
-- `titanic_eda.ipynb` — Full notebook: EDA, cleaning, visualization, and modeling
+- `titanic_eda.ipynb` — EDA, cleaning, visualization, classification, and model tuning on the Titanic dataset
+- `housing_regression.ipynb` — Regression model on the California Housing dataset
 - `data/` — Titanic dataset (train.csv, test.csv, gender_submission.csv)
