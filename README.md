@@ -69,3 +69,43 @@ This repository contains my work for the Neurofive Solutions ML internship track
 - `titanic_eda.ipynb` — EDA, cleaning, visualization, classification, and model tuning on the Titanic dataset
 - `housing_regression.ipynb` — Regression model on the California Housing dataset
 - `data/` — Titanic dataset (train.csv, test.csv, gender_submission.csv)
+## Task 7: Handling Class Imbalance (Telco Churn Dataset)
+
+Real-world classification problems like churn, fraud, or disease 
+detection are rarely balanced — the "rare" outcome is usually far less 
+common than the "normal" one. This task focused on identifying that 
+imbalance and properly addressing it instead of letting it silently 
+hurt the model's usefulness.
+
+- Checked class balance of the target variable and visualized it with a bar chart
+- Found the dataset was imbalanced: 5,174 customers did not churn vs 1,869 who did (~26.5% churn rate)
+- Applied two techniques to address the imbalance: `class_weight='balanced'` and SMOTE (Synthetic Minority Oversampling)
+- Retrained the model with each approach and compared precision, recall, and F1-score before and after
+
+### Why Accuracy Would Be Misleading Here
+
+With only ~27% of customers actually churning, a model that always 
+predicted "No Churn" would still score around 73% accuracy — without 
+ever correctly identifying a single customer who churned. This makes 
+accuracy a poor measure of real performance, since it hides how well 
+the model detects the minority class. Precision, recall, and F1-score 
+reveal this gap because they specifically measure performance on each 
+class individually, not just overall correctness.
+
+### Before vs After: Handling Imbalance
+
+- Precision (Churn): 0.66 → 0.51 (class_weight) → 0.50 (SMOTE)
+- Recall (Churn): 0.57 → 0.79 (class_weight) → 0.80 (SMOTE)
+- F1-score (Churn): 0.61 → 0.62 (class_weight) → 0.62 (SMOTE)
+
+Both techniques significantly improved recall — the model went from 
+catching only 57% of actual churners to catching around 80% of them. 
+This came at the cost of precision, meaning the model now flags more 
+false alarms. However, this trade-off is usually worthwhile in a churn 
+prevention context: failing to identify an at-risk customer (a missed 
+churner) is typically more costly to a business than occasionally 
+offering a retention incentive to a customer who wasn't actually going 
+to leave. F1-score stayed roughly the same, showing the overall balance 
+was preserved while shifting the model's behavior toward catching more 
+of the minority class — exactly the intended effect of addressing 
+class imbalance.
